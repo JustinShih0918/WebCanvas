@@ -15,45 +15,49 @@
     <h1 class="header">Web Canvas</h1>
     <div class="container">
         <canvas id="drawingCanvas" width="800" height="500"></canvas>
-        <div class="toolbar">
-            <button id="brush" class="btn btn-primary">Brush</button>
-            <button id="eraser" class="btn btn-secondary">Eraser</button>
-            <button id="textTool" class="btn btn-info">Text</button>
-            
-            <!-- Add shape buttons -->
-            <div class="btn-group mt-2">
-                <button id="circleShape" class="btn btn-outline-dark">Circle</button>
-                <button id="rectShape" class="btn btn-outline-dark">Rectangle</button>
-                <button id="triangleShape" class="btn btn-outline-dark">Triangle</button>
+        <div class="toolbar-container">
+            <div class="toolbar">
+                <button id="brush" class="btn btn-primary">Brush</button>
+                <button id="eraser" class="btn btn-secondary">Eraser</button>
+                <button id="textTool" class="btn btn-info">Text</button>
+                
+                <div id="textControls" style="display: none;">
+                    <select id="fontFamily" class="form-select mt-2">
+                        <option value="Arial">Arial</option>
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Courier New">Courier New</option>
+                        <option value="Georgia">Georgia</option>
+                        <option value="Verdana">Verdana</option>
+                    </select>
+                    <select id="fontSize" class="form-select mt-2">
+                        <option value="12">12px</option>
+                        <option value="16">16px</option>
+                        <option value="20" selected>20px</option>
+                        <option value="24">24px</option>
+                        <option value="32">32px</option>
+                        <option value="48">48px</option>
+                    </select>
+                </div>
+                
+                <div id="colorSelector"></div>
+                <select id="brushSize" class="form-select">
+                    <option value="5">5px</option>
+                    <option value="10">10px</option>
+                    <option value="20">20px</option>
+                    <option value="30">30px</option>
+                    <option value="50">50px</option>
+                </select>
+                <button id="clearCanvas" class="btn btn-danger">Clear</button>
             </div>
             
-            <div id="textControls" style="display: none;">
-                <select id="fontFamily" class="form-select mt-2">
-                    <option value="Arial">Arial</option>
-                    <option value="Times New Roman">Times New Roman</option>
-                    <option value="Courier New">Courier New</option>
-                    <option value="Georgia">Georgia</option>
-                    <option value="Verdana">Verdana</option>
-                </select>
-                <select id="fontSize" class="form-select mt-2">
-                    <option value="12">12px</option>
-                    <option value="16">16px</option>
-                    <option value="20" selected>20px</option>
-                    <option value="24">24px</option>
-                    <option value="32">32px</option>
-                    <option value="48">48px</option>
-                </select>
+            <div class="shapes-container">
+                <h6>Shapes</h6>
+                <div class="btn-group">
+                    <button id="circleShape" class="btn btn-outline-dark">Circle</button>
+                    <button id="rectShape" class="btn btn-outline-dark">Rectangle</button>
+                    <button id="triangleShape" class="btn btn-outline-dark">Triangle</button>
+                </div>
             </div>
-            
-            <div id="colorPicker"></div>
-            <select id="brushSize" class="form-select">
-                <option value="5">5px</option>
-                <option value="10">10px</option>
-                <option value="20">20px</option>
-                <option value="30">30px</option>
-                <option value="50">50px</option>
-            </select>
-            <button id="clearCanvas" class="btn btn-danger">Clear</button>
         </div>
     </div>
     <script src="script.js"></script>

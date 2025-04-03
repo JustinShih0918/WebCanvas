@@ -2,46 +2,63 @@ const canvas = document.getElementById('drawingCanvas');
 const ctx = canvas.getContext('2d');
 let brushSize = 5;
 let color = '#000000';
-let isDrawingMode = false;
-let isErasingMode = false;
-let isTextMode = false;  // New text mode flag
-let isDrawing = false;
 let lastX = 0, lastY = 0;
 
-// Add these variables at the top with other state variables
-let textInputActive = false;
-let textPositionX = null;
-let textPositionY = null;
 
-// Add shape state variables at the top
+// mode variables
+let isDrawingMode = false;
+let isErasingMode = false;
+let isTextMode = false;
 let isCircleMode = false;
 let isRectMode = false;
 let isTriangleMode = false;
 let isShapeDrawing = false;
+
+// is using canvas
+let isDrawing = false;
+
+
+// text input
+let textInputActive = false;
+let textPositionX = null;
+let textPositionY = null;
+let fontSize = 20;
+let fontFamily = 'Arial';
+
+// get cavas
 let startX = 0, startY = 0;
 let tempCanvas = document.createElement('canvas');
 let tempCtx = tempCanvas.getContext('2d');
-
-// Configure temp canvas
 tempCanvas.width = canvas.width;
 tempCanvas.height = canvas.height;
 
 // Get DOM elements
 const brushBtn = document.getElementById('brush');
 const eraserBtn = document.getElementById('eraser');
-const textBtn = document.getElementById('textTool');  // New text button
-const textControls = document.getElementById('textControls'); // Text controls container
-
-// Get shape buttons
+const textBtn = document.getElementById('textTool');  
+const textControls = document.getElementById('textControls');
 const circleBtn = document.getElementById('circleShape');
 const rectBtn = document.getElementById('rectShape');
 const triangleBtn = document.getElementById('triangleShape');
 
-// Text properties
-let fontSize = 20;
-let fontFamily = 'Arial';
+// color selector
+const selector = Pickr.create({
+    el: '#colorSelector',
+    theme: 'classic',
+    default: '#000000',
+    components: {
+        preview: true,
+        opacity: true,
+        hue: true
+    }
+});
 
-// Replace the getMousePos function with this improved version
+selector.on('change', (newColor) => {
+    color = newColor.toHEXA().toString();
+});
+
+
+// get the mouse position
 function getMousePos(canvas, evt) {
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
@@ -53,7 +70,7 @@ function getMousePos(canvas, evt) {
     };
 }
 
-// Update UI to reflect active state
+// when selecting a botton, do this again to update the mode
 function updateButtonStates() {
     brushBtn.classList.toggle('active', isDrawingMode);
     eraserBtn.classList.toggle('active', isErasingMode);
@@ -62,9 +79,9 @@ function updateButtonStates() {
     rectBtn.classList.toggle('active', isRectMode);
     triangleBtn.classList.toggle('active', isTriangleMode);
     
-    // Show/hide text controls
     textControls.style.display = isTextMode ? 'block' : 'none';
     
+    // update cursor based on the mode
     if (isDrawingMode) {
         canvas.style.cursor = 'url("media/brush-icon.png") 0 0, crosshair';
     } else if (isErasingMode) {
@@ -78,6 +95,7 @@ function updateButtonStates() {
     }
 }
 
+document.getElementById('brushSize').addEventListener('change', (e) => brushSize = e.target.value);
 brushBtn.addEventListener('click', () => {
     isDrawingMode = !isDrawingMode;
     
@@ -103,25 +121,6 @@ eraserBtn.addEventListener('click', () => {
         isRectMode = false;
         isTriangleMode = false;
         ctx.globalCompositeOperation = 'destination-out';
-    }
-    
-    updateButtonStates();
-});
-
-// Replace or update your existing text button handler
-textBtn.addEventListener('click', () => {
-    isTextMode = !isTextMode;
-    
-    if (isTextMode) {
-        isDrawingMode = false;
-        isErasingMode = false;
-        isCircleMode = false;
-        isRectMode = false;
-        isTriangleMode = false;
-        ctx.globalCompositeOperation = 'source-over';
-    } else {
-        // Reset text input when turning off text mode
-        textInputActive = false;
     }
     
     updateButtonStates();
@@ -173,17 +172,34 @@ triangleBtn.addEventListener('click', () => {
     updateButtonStates();
 });
 
-// Handle font family changes
+// text operations
+textBtn.addEventListener('click', () => {
+    isTextMode = !isTextMode;
+    
+    if (isTextMode) {
+        isDrawingMode = false;
+        isErasingMode = false;
+        isCircleMode = false;
+        isRectMode = false;
+        isTriangleMode = false;
+        ctx.globalCompositeOperation = 'source-over';
+    } else {
+        textInputActive = false;
+    }
+    
+    updateButtonStates();
+});
+
 document.getElementById('fontFamily').addEventListener('change', (e) => {
     fontFamily = e.target.value;
 });
 
-// Handle font size changes
 document.getElementById('fontSize').addEventListener('change', (e) => {
     fontSize = parseInt(e.target.value);
 });
 
-// Replace canvas click event for text tool
+// Replace the current canvas text click event handler with this improved version
+
 canvas.addEventListener('click', (e) => {
     if (!isTextMode) return;
     
@@ -200,7 +216,7 @@ canvas.addEventListener('click', (e) => {
     textPositionX = pos.x;
     textPositionY = pos.y;
     
-    // Create dynamic text input
+    // make a new text
     textInputActive = true;
     const canvasRect = canvas.getBoundingClientRect();
     const inputElement = document.createElement('input');
@@ -220,33 +236,16 @@ canvas.addEventListener('click', (e) => {
     document.body.appendChild(inputElement);
     inputElement.focus();
     
-    // Handle Enter key
     const enterHandler = function(e) {
         if (e.key === 'Enter') {
-            finalizeText(inputElement);
+            confirmText(inputElement);
         }
     };
     inputElement.addEventListener('keydown', enterHandler);
-    
-    // Replace document click handler with this
-    let clickHandler;
-    setTimeout(() => {
-        clickHandler = function handleClick(evt) {
-            if (evt.target !== inputElement && evt.target !== canvas) {
-                finalizeText(inputElement);
-                document.removeEventListener('click', clickHandler);
-            }
-        };
-        document.addEventListener('click', clickHandler);
-    }, 100);
-    
-    // Store references to event handlers for cleanup
     inputElement.enterHandler = enterHandler;
-    inputElement.clickHandler = clickHandler;
 });
 
-// Function to finalize text and place on canvas
-function finalizeText(inputElement) {
+function confirmText(inputElement) {
     const text = inputElement.value;
     if (text && textPositionX !== null && textPositionY !== null) {
         ctx.font = `${fontSize}px ${fontFamily}`;
@@ -255,31 +254,25 @@ function finalizeText(inputElement) {
         ctx.fillText(text, textPositionX, textPositionY);
     }
     
-    // Clean up event listeners
+    // Clean
     if (inputElement.enterHandler) {
         inputElement.removeEventListener('keydown', inputElement.enterHandler);
     }
-    if (inputElement.clickHandler) {
-        document.removeEventListener('click', inputElement.clickHandler);
-    }
-    
-    // Clean up DOM element
     if (document.body.contains(inputElement)) {
         document.body.removeChild(inputElement);
     }
     
+    // close text input
     textInputActive = false;
 }
 
-document.getElementById('brushSize').addEventListener('change', (e) => brushSize = e.target.value);
 
-// Update the clearCanvas event listener
+// do clear
 document.getElementById('clearCanvas').addEventListener('click', () => {
-    // Clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
     
-    // Reset all states
+    // reset
     isDrawingMode = false;
     isErasingMode = false;
     isTextMode = false;
@@ -290,7 +283,7 @@ document.getElementById('clearCanvas').addEventListener('click', () => {
     isShapeDrawing = false;
 });
 
-// Shape drawing event handlers
+// Shape drawing
 canvas.addEventListener('mousedown', (e) => {
     if (isDrawingMode || isErasingMode) {
         isDrawing = true;
@@ -302,7 +295,6 @@ canvas.addEventListener('mousedown', (e) => {
         const pos = getMousePos(canvas, e);
         startX = pos.x;
         startY = pos.y;
-        // Store the current canvas state for preview
         tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
         tempCtx.drawImage(canvas, 0, 0);
     }
@@ -324,7 +316,6 @@ canvas.addEventListener('mouseleave', () => {
 
 canvas.addEventListener('mousemove', (e) => {
     if (isDrawing) {
-        // Existing drawing code...
         const pos = getMousePos(canvas, e);
         ctx.lineWidth = brushSize;
         ctx.lineCap = 'round';
@@ -340,7 +331,6 @@ canvas.addEventListener('mousemove', (e) => {
     } else if (isShapeDrawing) {
         const pos = getMousePos(canvas, e);
         
-        // Preview the shape without flickering
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(tempCanvas, 0, 0);
         
@@ -348,7 +338,6 @@ canvas.addEventListener('mousemove', (e) => {
     }
 });
 
-// Function to preview shapes while dragging
 function previewShape(x1, y1, x2, y2) {
     ctx.lineWidth = brushSize;
     ctx.strokeStyle = color;
@@ -375,7 +364,6 @@ function previewShape(x1, y1, x2, y2) {
     }
 }
 
-// Function to draw the final shape
 function drawShape(x1, y1, x2, y2) {
     ctx.lineWidth = brushSize;
     ctx.strokeStyle = color;
