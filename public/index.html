@@ -15,7 +15,7 @@
 <body>
     <h1 class="header">Web Canvas</h1>
     <div class="container">
-        <canvas id="drawingCanvas" width="800" height="500"></canvas>
+        <canvas id="Canvas" width="800" height="500"></canvas>
         <div class="toolbar-container">
             <div class="toolbar">
                 <button id="brush" class="btn btn-primary">
@@ -24,11 +24,11 @@
                 <button id="eraser" class="btn btn-secondary">
                     <i class="bi bi-eraser"></i> Eraser
                 </button>
-                <button id="textTool" class="btn btn-info">
+                <button id="textBtn" class="btn btn-info">
                     <i class="bi bi-type"></i> Text
                 </button>
                 
-                <button id="imageTool" class="btn btn-warning">
+                <button id="imageBtn" class="btn btn-warning">
                     <i class="bi bi-image"></i> Image
                 </button>
                 
@@ -36,8 +36,8 @@
                     <select id="fontFamily" class="form-select mt-2">
                         <option value="Arial">Arial</option>
                         <option value="Times New Roman">Times New Roman</option>
-                        <option value="Courier New">Courier New</option>
-                        <option value="Georgia">Georgia</option>
+                        <option value="STKaiti">華文楷體</option>
+                        <option value="STFangsong">華文仿宋</option>
                         <option value="Verdana">Verdana</option>
                     </select>
                     <select id="fontSize" class="form-select mt-2">
@@ -60,7 +60,7 @@
                     <option value="30">30px</option>
                     <option value="50">50px</option>
                 </select>
-                <button id="clearCanvas" class="btn btn-danger">
+                <button id="clearBtn" class="btn btn-danger">
                     <i class="bi bi-trash"></i> Clear
                 </button>
                 
@@ -72,13 +72,13 @@
             <div class="shapes-container">
                 <h6>Shapes</h6>
                 <div class="btn-group">
-                    <button id="circleShape" class="btn btn-outline-dark shape-btn" data-bs-toggle="cut" title="Circle">
+                    <button id="circle" class="btn btn-outline-dark shape-btn" data-bs-toggle="cut" title="Circle">
                         <i class="bi bi-circle"></i> <span class="btn-text">Circle</span>
                     </button>
-                    <button id="rectShape" class="btn btn-outline-dark shape-btn" data-bs-toggle="cut" title="Rectangle">
+                    <button id="rect" class="btn btn-outline-dark shape-btn" data-bs-toggle="cut" title="Rectangle">
                         <i class="bi bi-square"></i> <span class="btn-text">Rectangle</span>
                     </button>
-                    <button id="triangleShape" class="btn btn-outline-dark shape-btn" data-bs-toggle="cut" title="Triangle">
+                    <button id="triangle" class="btn btn-outline-dark shape-btn" data-bs-toggle="cut" title="Triangle">
                         <i class="bi bi-triangle"></i> <span class="btn-text">Triangle</span>
                     </button>
                 </div>

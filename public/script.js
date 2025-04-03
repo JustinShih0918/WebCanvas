@@ -1,4 +1,4 @@
-const canvas = document.getElementById('drawingCanvas');
+const canvas = document.getElementById('Canvas');
 const ctx = canvas.getContext('2d');
 let brushSize = 5;
 let color = '#000000';
@@ -40,12 +40,12 @@ tempCanvas.height = canvas.height;
 // Get DOM elements
 const brushBtn = document.getElementById('brush');
 const eraserBtn = document.getElementById('eraser');
-const textBtn = document.getElementById('textTool');  
+const textBtn = document.getElementById('textBtn');  
 const textControls = document.getElementById('textControls');
-const circleBtn = document.getElementById('circleShape');
-const rectBtn = document.getElementById('rectShape');
-const triangleBtn = document.getElementById('triangleShape');
-const imageTool = document.getElementById('imageTool');
+const circleBtn = document.getElementById('circle');
+const rectBtn = document.getElementById('rect');
+const triangleBtn = document.getElementById('triangle');
+const imageBtn = document.getElementById('imageBtn');
 const imageControls = document.getElementById('imageControls');
 const imageUpload = document.getElementById('imageUpload');
 const uploadImageBtn = document.getElementById('uploadImageBtn');
@@ -94,7 +94,7 @@ function updateButtonStates() {
     circleBtn.classList.toggle('active', isCircleMode);
     rectBtn.classList.toggle('active', isRectMode);
     triangleBtn.classList.toggle('active', isTriangleMode);
-    imageTool.classList.toggle('active', isImageMode);
+    imageBtn.classList.toggle('active', isImageMode);
     
     // Only show text controls, not image controls
     textControls.style.display = isTextMode ? 'block' : 'none';
@@ -290,7 +290,7 @@ function confirmText(inputElement) {
 }
 
 // Modify the image tool button handler
-imageTool.addEventListener('click', () => {
+imageBtn.addEventListener('click', () => {
     // If already in image mode, toggle it off
     if (isImageMode) {
         isImageMode = false;
@@ -350,7 +350,7 @@ function loadImage(file) {
 }
 
 // do clear
-document.getElementById('clearCanvas').addEventListener('click', () => {
+document.getElementById('clearBtn').addEventListener('click', () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
     
