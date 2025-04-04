@@ -113,7 +113,6 @@ button i.bi {
     width: 100%;
 }
 
-
 .message-notification {
     position: fixed;
     bottom: 20px;
@@ -223,4 +222,9 @@ button i.bi {
     .btn-group {
         max-width: 300px;
     }
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }

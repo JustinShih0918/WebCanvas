@@ -3,6 +3,10 @@ const ctx = canvas.getContext('2d');
 let brushSize = 5;
 let color = '#000000';
 let lastX = 0, lastY = 0;
+let startX = 0, startY = 0;
+let history = [];
+let curHistoryIdx = -1;
+const MAX_HISTORY = 50;
 
 // mode variables
 let isDrawingMode = false;
@@ -17,8 +21,6 @@ let isDrawing = false;
 let isShapeDrawing = false;
 let isImgMode = false;
 
-
-
 // text input
 let textInputActive = false;
 let textPosX = null;
@@ -32,14 +34,13 @@ let imgPosX = 0;
 let imgPosY = 0;
 let placingImg = false;
 
-// temp
-let startX = 0, startY = 0;
+// tmp
 let tmpCanvas = document.createElement('canvas');
 let tmpCtx = tmpCanvas.getContext('2d');
 tmpCanvas.width = canvas.width;
 tmpCanvas.height = canvas.height;
 
-// Get DOM elements
+// Get objects
 const brushBtn = document.getElementById('brush');
 const eraserBtn = document.getElementById('eraser');
 const textBtn = document.getElementById('textBtn');  
@@ -49,6 +50,8 @@ const rectBtn = document.getElementById('rect');
 const triangleBtn = document.getElementById('triangle');
 const imageBtn = document.getElementById('imageBtn');
 const imgUpload = document.getElementById('imgUpload');
+const undoBtn = document.getElementById('undoBtn');
+const redoBtn = document.getElementById('redoBtn');
 
 // color selector
 const selector = Pickr.create({
@@ -60,10 +63,6 @@ const selector = Pickr.create({
         opacity: true,
         hue: true,
         interaction: {
-            hex: true,
-            rgba: true,
-            input: true,
-            clear: true,
             save: true
         }
     }
@@ -72,6 +71,56 @@ const selector = Pickr.create({
 selector.on('change', (newColor) => {
     // Update the color variable
     color = newColor.toHEXA().toString();
+});
+
+// save history
+function saveHistory(){
+    if(curHistoryIdx < history.length - 1){
+        history = history.slice(0, curHistoryIdx + 1);
+    }
+
+    const curMove = canvas.toDataURL();
+    history.push(curMove);
+    curHistoryIdx = history.length - 1;
+    console.log(curHistoryIdx);
+
+    if(history.length > MAX_HISTORY){
+        history.shift();
+        curHistoryIdx--;
+    }
+    updateUndoRedoBtn();
+}
+
+function updateUndoRedoBtn() {
+    undoBtn.disabled = (curHistoryIdx <= 0);
+    redoBtn.disabled = (curHistoryIdx >= history.length - 1);
+}
+
+function doRestore(move) {
+    const img = new Image();
+    img.onload = function(){
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+    }
+    img.src = move;
+}
+
+undoBtn.addEventListener('click', () => {
+    if(curHistoryIdx > 0){
+        curHistoryIdx--;
+        doRestore(history[curHistoryIdx]);
+        updateUndoRedoBtn();
+    }
+    else showMessage('No more undo available', 'warning');
+});
+
+redoBtn.addEventListener('click', () => {
+    if(curHistoryIdx < history.length - 1){
+        curHistoryIdx++;
+        doRestore(history[curHistoryIdx]);
+        updateUndoRedoBtn();
+    }
+    else showMessage('No more redo available', 'warning');
 });
 
 // get the mouse position
@@ -298,6 +347,7 @@ function confirmText(inputElement) {
         ctx.fillStyle = color;
         ctx.textBaseline = 'middle';
         ctx.fillText(text, textPosX, textPosY);
+        saveHistory();
     }
     
     // Clean
@@ -384,8 +434,12 @@ document.getElementById('clearBtn').addEventListener('click', () => {
     isImgMode = false;
     curImg = null;
     placingImg = false;
+    history = [];
+    curHistoryIdx = -1;
     
+    saveHistory();
     updateButtonStates();
+    showMessage('Canvas cleared', 'success');
 });
 
 // Shape drawing
@@ -419,6 +473,7 @@ canvas.addEventListener('mouseup', (e) => {
         const pos = getMousePos(canvas, e);
         drawShape(startX, startY, pos.x, pos.y);
         isShapeDrawing = false;
+        saveHistory();
     }
     
     if (placingImg && curImg) {
@@ -426,8 +481,11 @@ canvas.addEventListener('mouseup', (e) => {
         curImg = null;
         updateButtonStates();
         showMessage('Image placed successfully', 'success');
+        saveHistory();
     }
     
+    if(isDrawing) saveHistory();
+
     isDrawing = false;
     placingImg = false;
 });
@@ -583,6 +641,8 @@ function showMessage(message, type = 'info') {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    saveHistory();
+    updateButtonStates();
     // Initialize tooltips
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="cut"]'));
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
