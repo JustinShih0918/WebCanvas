@@ -28,7 +28,6 @@
         <canvas id="Canvas" width="800" height="500"></canvas>
         <div class="toolbar-container">
             <div class="toolbar">
-                <!-- Row 1: Main tools -->
                 <button id="brush" class="btn btn-primary toolbar-btn">
                     <i class="bi bi-brush"></i> <span class="btn-text">Brush</span>
                 </button>
@@ -36,7 +35,6 @@
                     <i class="bi bi-eraser"></i> <span class="btn-text">Eraser</span>
                 </button>
                 
-                <!-- Row 2: Text and Image tools -->
                 <button id="textBtn" class="btn btn-info toolbar-btn">
                     <i class="bi bi-type"></i> <span class="btn-text">Text</span>
                 </button>
@@ -44,7 +42,6 @@
                     <i class="bi bi-image"></i> <span class="btn-text">Image</span>
                 </button>
                 
-                <!-- Full width: Text controls -->
                 <div id="textControls" style="display: none;">
                     <select id="fontType" class="form-select mt-2">
                         <option value="Arial">Arial</option>
@@ -63,16 +60,13 @@
                     </select>
                 </div>
                 
-                <!-- Hidden file input -->
                 <input type="file" id="imgUpload" accept="image/*" style="display: none;">
                 
-                <!-- Full width: Color selector -->
                 <button id="colorBtn" class="btn btn-light toolbar-btn" style="grid-column: span 2;">
                     <i class="bi bi-palette" id="colorIcon"></i><span class="btn-text" id="colorText">Color Select</span>
                 </button>
                 <div id="colorSelector" style="display: none;"></div>
                 
-                <!-- Row 3: Brush size -->
                 <select id="brushSize" class="form-select" style="grid-column: span 2;">
                     <option value="5">5px</option>
                     <option value="10">10px</option>
@@ -81,7 +75,6 @@
                     <option value="50">50px</option>
                 </select>
                 
-                <!-- Row 4: Clear and Download -->
                 <button id="clearBtn" class="btn btn-danger toolbar-btn">
                     <i class="bi bi-trash"></i> <span class="btn-text">Clear</span>
                 </button>
@@ -89,7 +82,6 @@
                     <i class="bi bi-download"></i> <span class="btn-text">Download</span>
                 </button>
                 
-                <!-- Row 5: Undo and Redo -->
                 <button id="undoBtn" class="btn btn-outline-secondary toolbar-btn">
                     <i class="bi bi-arrow-counterclockwise"></i> <span class="btn-text">Undo</span>
                 </button>
