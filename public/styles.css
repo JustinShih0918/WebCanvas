@@ -43,12 +43,28 @@ canvas {
     width: 120px;
 }
 
+/* Modify the toolbar CSS to use a grid layout */
 .toolbar {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two equal columns */
+    gap: 8px;
     width: 100%;
+    max-width: 240px; /* Wider to accommodate two columns */
+}
+
+/* Make buttons fit the grid cells properly */
+.toolbar button,
+.toolbar select,
+.toolbar #colorSelector {
+    width: 100%;
+    width: auto;
+    min-width: 0; /* Allows buttons to shrink below their content size */
+}
+
+/* Special handling for full-width elements */
+.toolbar #textControls,
+.toolbar #colorSelector {
+    grid-column: span 2; /* Make these span both columns */
 }
 
 .shapes-container {
@@ -179,18 +195,6 @@ button i.bi {
 }
 
 @media (max-width: 768px) {
-    .btn-group .shape-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-}
-
-.tooltip {
-    font-size: 0.8rem;
-}
-
-@media (max-width: 768px) {
     .container {
         flex-direction: column;
         align-items: center;
@@ -224,7 +228,70 @@ button i.bi {
     }
 }
 
+/* For mobile view */
+@media (max-width: 768px) {
+    .toolbar {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        max-width: 100%;
+    }
+    
+    .toolbar #textControls,
+    .toolbar #colorSelector,
+    .toolbar #brushSize {
+        grid-column: 1 / -1; /* Span all columns in mobile view */
+    }
+}
+
 button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+/* Add this to your styles.css file */
+
+/* Base styling for toolbar buttons */
+.toolbar-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+}
+
+.toolbar-btn i.bi {
+    margin-right: 5px;
+}
+
+/* On larger screens, hide text and show only icons */
+@media (min-width: 769px) {
+    .toolbar-btn .btn-text {
+        display: none;
+    }
+    
+    .toolbar-btn {
+        padding: 10px;
+    }
+    
+    .toolbar-btn i.bi {
+        margin-right: 0;
+        font-size: 1.2rem;
+    }
+}
+
+/* On smaller screens, ensure text is visible */
+@media (max-width: 768px) {
+    .toolbar-btn {
+        padding: 6px 8px;
+        font-size: 0.9rem;
+    }
+    
+    .toolbar-btn i.bi {
+        font-size: 1rem;
+    }
+}
+
+.colorSelector-container {
+    grid-column: span 2;
+    display: flex;
+    width: 100%;
+    align-items: center;
 }

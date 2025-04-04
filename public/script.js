@@ -643,9 +643,4 @@ function showMessage(message, type = 'info') {
 document.addEventListener('DOMContentLoaded', function() {
     saveHistory();
     updateButtonStates();
-    // Initialize tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="cut"]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
 });

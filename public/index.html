@@ -18,20 +18,23 @@
         <canvas id="Canvas" width="800" height="500"></canvas>
         <div class="toolbar-container">
             <div class="toolbar">
-                <button id="brush" class="btn btn-primary">
-                    <i class="bi bi-brush"></i> Brush
+                <!-- Row 1: Main tools -->
+                <button id="brush" class="btn btn-primary toolbar-btn">
+                    <i class="bi bi-brush"></i> <span class="btn-text">Brush</span>
                 </button>
-                <button id="eraser" class="btn btn-secondary">
-                    <i class="bi bi-eraser"></i> Eraser
-                </button>
-                <button id="textBtn" class="btn btn-info">
-                    <i class="bi bi-type"></i> Text
+                <button id="eraser" class="btn btn-secondary toolbar-btn">
+                    <i class="bi bi-eraser"></i> <span class="btn-text">Eraser</span>
                 </button>
                 
-                <button id="imageBtn" class="btn btn-warning">
-                    <i class="bi bi-image"></i> Image
+                <!-- Row 2: Text and Image tools -->
+                <button id="textBtn" class="btn btn-info toolbar-btn">
+                    <i class="bi bi-type"></i> <span class="btn-text">Text</span>
+                </button>
+                <button id="imageBtn" class="btn btn-warning toolbar-btn">
+                    <i class="bi bi-image"></i> <span class="btn-text">Image</span>
                 </button>
                 
+                <!-- Full width: Text controls -->
                 <div id="textControls" style="display: none;">
                     <select id="fontType" class="form-select mt-2">
                         <option value="Arial">Arial</option>
@@ -50,41 +53,50 @@
                     </select>
                 </div>
                 
+                <!-- Hidden file input -->
                 <input type="file" id="imgUpload" accept="image/*" style="display: none;">
                 
-                <div id="colorSelector"></div>
-                <select id="brushSize" class="form-select">
+                <!-- Full width: Color selector -->
+                <div class="colorSelector-container">
+                    <h6 class="mb-0 me-2">Color Select</h6>
+                    <div id="colorSelector"></div>
+                </div>                
+                <!-- Row 3: Brush size -->
+                <select id="brushSize" class="form-select" style="grid-column: span 2;">
                     <option value="5">5px</option>
                     <option value="10">10px</option>
                     <option value="20">20px</option>
                     <option value="30">30px</option>
                     <option value="50">50px</option>
                 </select>
-                <button id="clearBtn" class="btn btn-danger">
-                    <i class="bi bi-trash"></i> Clear
+                
+                <!-- Row 4: Clear and Download -->
+                <button id="clearBtn" class="btn btn-danger toolbar-btn">
+                    <i class="bi bi-trash"></i> <span class="btn-text">Clear</span>
+                </button>
+                <button id="downloadBtn" class="btn btn-success toolbar-btn">
+                    <i class="bi bi-download"></i> <span class="btn-text">Download</span>
                 </button>
                 
-                <button id="downloadBtn" class="btn btn-success">
-                    <i class="bi bi-download"></i> Download
+                <!-- Row 5: Undo and Redo -->
+                <button id="undoBtn" class="btn btn-outline-secondary toolbar-btn">
+                    <i class="bi bi-arrow-counterclockwise"></i> <span class="btn-text">Undo</span>
                 </button>
-                <button id="undoBtn" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-counterclockwise"></i> Undo
-                </button>
-                <button id="redoBtn" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-clockwise"></i> Redo
+                <button id="redoBtn" class="btn btn-outline-secondary toolbar-btn">
+                    <i class="bi bi-arrow-clockwise"></i> <span class="btn-text">Redo</span>
                 </button>
             </div>
             
             <div class="shapes-container">
                 <h6>Shapes</h6>
                 <div class="btn-group">
-                    <button id="circle" class="btn btn-outline-dark shape-btn" data-bs-toggle="cut" title="Circle">
+                    <button id="circle" class="btn btn-outline-dark shape-btn">
                         <i class="bi bi-circle"></i> <span class="btn-text">Circle</span>
                     </button>
-                    <button id="rect" class="btn btn-outline-dark shape-btn" data-bs-toggle="cut" title="Rectangle">
+                    <button id="rect" class="btn btn-outline-dark shape-btn">
                         <i class="bi bi-square"></i> <span class="btn-text">Rectangle</span>
                     </button>
-                    <button id="triangle" class="btn btn-outline-dark shape-btn" data-bs-toggle="cut" title="Triangle">
+                    <button id="triangle" class="btn btn-outline-dark shape-btn" >
                         <i class="bi bi-triangle"></i> <span class="btn-text">Triangle</span>
                     </button>
                 </div>
