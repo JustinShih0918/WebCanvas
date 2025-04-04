@@ -27,11 +27,13 @@ body {
 }
 
 canvas {
-    border: 1px solid black;
-    background-color: white;
+    border: 3px solid black;
+    background-color: rgba(255, 255, 255, 1); /* Slightly transparent white */
+    border-radius: 15px;
     flex-grow: 1;
     max-width: 100%;
     position: relative;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
 }
 
 .toolbar-container {
@@ -179,7 +181,7 @@ button i.bi {
     text-align: center;
 }
 
-@media (min-width: 769px) {
+@media (min-width: 768px) {
     .btn-group .shape-btn .btn-text {
         display: none;
     }
@@ -294,4 +296,83 @@ button:disabled {
     display: flex;
     width: 100%;
     align-items: center;
+}
+
+.pcr-app {
+    position: fixed;
+    top: auto;
+    left: auto;
+    transform: none;
+    margin-top: 5px;
+}
+
+#colorSelector {
+    position: relative;
+    display: block;
+}
+
+.corner-img {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: -1; /* This is the key change - negative z-index puts it behind everything */
+    pointer-events: none;
+    width: 250px;
+    height: 250px;
+    overflow: hidden;
+}
+
+.corner-img img {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    object-position: bottom left;
+}
+
+/* Make the image smaller on mobile */
+@media (max-width: 768px) {
+    .corner-img {
+        width: 150px;
+        height: 150px;
+    }
+}
+
+.right-img {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    z-index: -1; /* This is the key change - negative z-index puts it behind everything */
+    pointer-events: none;
+    width: 250px;
+    height: 250px;
+    overflow: hidden;
+}
+
+.right-img img {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    object-position: bottom left;
+}
+
+/* Make the image smaller on mobile */
+@media (max-width: 768px) {
+    .right-img {
+        width: 150px;
+        height: 150px;
+    }
+}
+
+#textControls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    overflow: auto;
 }

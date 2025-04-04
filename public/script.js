@@ -58,6 +58,7 @@ const selector = Pickr.create({
     el: '#colorSelector',
     theme: 'classic',
     default: '#000000',
+    useAsButton: true,
     components: {
         preview: true,
         opacity: true,
@@ -68,10 +69,48 @@ const selector = Pickr.create({
     }
 });
 
-selector.on('change', (newColor) => {
-    // Update the color variable
-    color = newColor.toHEXA().toString();
+document.getElementById('colorBtn').addEventListener('click', () => {
+    selector.show();
+    const btnRect = document.getElementById('colorBtn').getBoundingClientRect();
+    const windowWid = window.innerWidth;
+    let leftPos = 0;
+    console.log(windowWid);
+    if(windowWid > 768) leftPos = btnRect.left - 400;
+    else if(windowWid <= 768 && windowWid > 450) leftPos = btnRect.left;
+    else leftPos = 0;
+    setTimeout(() => {
+        const pcr = document.querySelector('.pcr-app');
+        if (pcr) {
+            pcr.style.top = (btnRect.top + 50) + 'px';
+            pcr.style.left = leftPos + 'px';
+        }
+    }, 0);
 });
+
+selector.on('change', (newColor) => {
+    color = newColor.toHEXA().toString();
+    document.getElementById('colorBtn').style.backgroundColor = color;
+    const contrastColor = getContrastColor(color);
+    document.getElementById('colorIcon').style.color = contrastColor;
+    document.getElementById('colorText').style.color = contrastColor;
+});
+
+selector.on('save', (newColor)=>{
+    color = newColor.toHEXA().toString();
+    document.getElementById('colorBtn').style.backgroundColor = color;
+    selector.hide();
+});
+
+// get contrast color for color text and color icon
+function getContrastColor(hexColor) {
+    const r = parseInt(hexColor.slice(1, 3), 16);
+    const g = parseInt(hexColor.slice(3, 5), 16);
+    const b = parseInt(hexColor.slice(5, 7), 16);
+    
+    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+    
+    return (brightness > 128) ? '#000000' : '#FFFFFF';
+}
 
 // save history
 function saveHistory(){

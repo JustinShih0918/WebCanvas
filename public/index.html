@@ -14,6 +14,13 @@
 </head>
 <body>
     <h1 class="header">Web Canvas</h1>
+
+    <div class="corner-img">
+        <img src="media/background-leftdown.png" alt="background">
+    </div>
+    <div class="right-img">
+        <img src="media/rightbutton.png" alt="background">
+    </div>
     <div class="container">
         <canvas id="Canvas" width="800" height="500"></canvas>
         <div class="toolbar-container">
@@ -57,10 +64,11 @@
                 <input type="file" id="imgUpload" accept="image/*" style="display: none;">
                 
                 <!-- Full width: Color selector -->
-                <div class="colorSelector-container">
-                    <h6 class="mb-0 me-2">Color Select</h6>
-                    <div id="colorSelector"></div>
-                </div>                
+                <button id="colorBtn" class="btn btn-light toolbar-btn" style="grid-column: span 2;">
+                    <i class="bi bi-palette" id="colorIcon"></i><span class="btn-text" id="colorText">Color Select</span>
+                </button>
+                <div id="colorSelector" style="display: none;"></div>
+                
                 <!-- Row 3: Brush size -->
                 <select id="brushSize" class="form-select" style="grid-column: span 2;">
                     <option value="5">5px</option>
