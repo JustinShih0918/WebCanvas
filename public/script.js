@@ -6,36 +6,38 @@ let lastX = 0, lastY = 0;
 
 // mode variables
 let isDrawingMode = false;
-let isErasingMode = false;
-let isTextMode = false;
-let isCircleMode = false;
-let isRectMode = false;
-let isTriangleMode = false;
-let isShapeDrawing = false;
-let isImageMode = false;
+let erasingMode = false;
+let textMode = false;
+let circleMode = false;
+let rectMode = false;
+let triangleMode = false;
 
 // is using canvas
 let isDrawing = false;
+let isShapeDrawing = false;
+let isImgMode = false;
+
+
 
 // text input
 let textInputActive = false;
-let textPositionX = null;
-let textPositionY = null;
+let textPosX = null;
+let textPosY = null;
 let fontSize = 20;
-let fontFamily = 'Arial';
+let fontType = 'Arial';
 
 // image variables
-let currentImage = null;
-let imagePositionX = 0;
-let imagePositionY = 0;
-let isImagePlacing = false;
+let curImg = null;
+let imgPosX = 0;
+let imgPosY = 0;
+let placingImg = false;
 
-// get canvas
+// temp
 let startX = 0, startY = 0;
-let tempCanvas = document.createElement('canvas');
-let tempCtx = tempCanvas.getContext('2d');
-tempCanvas.width = canvas.width;
-tempCanvas.height = canvas.height;
+let tmpCanvas = document.createElement('canvas');
+let tmpCtx = tmpCanvas.getContext('2d');
+tmpCanvas.width = canvas.width;
+tmpCanvas.height = canvas.height;
 
 // Get DOM elements
 const brushBtn = document.getElementById('brush');
@@ -46,9 +48,7 @@ const circleBtn = document.getElementById('circle');
 const rectBtn = document.getElementById('rect');
 const triangleBtn = document.getElementById('triangle');
 const imageBtn = document.getElementById('imageBtn');
-const imageControls = document.getElementById('imageControls');
-const imageUpload = document.getElementById('imageUpload');
-const uploadImageBtn = document.getElementById('uploadImageBtn');
+const imgUpload = document.getElementById('imgUpload');
 
 // color selector
 const selector = Pickr.create({
@@ -88,28 +88,48 @@ function getMousePos(canvas, evt) {
 
 // when selecting a button, do this again to update the mode
 function updateButtonStates() {
-    brushBtn.classList.toggle('active', isDrawingMode);
-    eraserBtn.classList.toggle('active', isErasingMode);
-    textBtn.classList.toggle('active', isTextMode);
-    circleBtn.classList.toggle('active', isCircleMode);
-    rectBtn.classList.toggle('active', isRectMode);
-    triangleBtn.classList.toggle('active', isTriangleMode);
-    imageBtn.classList.toggle('active', isImageMode);
-    
-    // Only show text controls, not image controls
-    textControls.style.display = isTextMode ? 'block' : 'none';
+    toggleButtons();
+    textControls.style.display = textMode ? 'block' : 'none';
     
     // Update cursor based on mode
-    if (isDrawingMode) canvas.style.cursor = 'url("media/brush-icon.png") 0 0, crosshair';
-    else if (isErasingMode) canvas.style.cursor = 'url("media/eraser-icon.png") 0 0, crosshair';
-    else if (isTextMode) canvas.style.cursor = 'text';
-    else if (isImageMode && currentImage) canvas.style.cursor = 'move';
-    else if (isImageMode) canvas.style.cursor = 'copy';
-    else if(isCircleMode) canvas.style.cursor = 'url("media/circle.png") 0 0, crosshair';
-    else if(isRectMode) canvas.style.cursor = 'url("media/rectangle.png") 0 0, crosshair';
-    else if(isTriangleMode) canvas.style.cursor = 'url("media/triangle.png") 0 0, crosshair';
-    else if(isImagePlacing) canvas.style.cursor = 'move';
-    else canvas.style.cursor = 'default';
+    switch (true) {
+        case isDrawingMode:
+            canvas.style.cursor = 'url("media/brush-icon.png") 0 0, crosshair';
+            break;
+        case erasingMode:
+            canvas.style.cursor = 'url("media/eraser-icon.png") 0 0, crosshair';
+            break;
+        case textMode:
+            canvas.style.cursor = 'text';
+            break;
+        case isImgMode && curImg:
+            canvas.style.cursor = 'move';
+            break;
+        case isImgMode:
+            canvas.style.cursor = 'copy';
+            break;
+        case circleMode:
+            canvas.style.cursor = 'url("media/circle.png") 0 0, crosshair';
+            break;
+        case rectMode:
+            canvas.style.cursor = 'url("media/rectangle.png") 0 0, crosshair';
+            break;
+        case triangleMode:
+            canvas.style.cursor = 'url("media/triangle.png") 0 0, crosshair';
+            break;
+        default:
+            canvas.style.cursor = 'default';
+    }
+}
+
+function toggleButtons(){
+    brushBtn.classList.toggle('active', isDrawingMode);
+    eraserBtn.classList.toggle('active', erasingMode);
+    textBtn.classList.toggle('active', textMode);
+    circleBtn.classList.toggle('active', circleMode);
+    rectBtn.classList.toggle('active', rectMode);
+    triangleBtn.classList.toggle('active', triangleMode);
+    imageBtn.classList.toggle('active', isImgMode);
 }
 
 document.getElementById('brushSize').addEventListener('change', (e) => brushSize = e.target.value);
@@ -117,12 +137,12 @@ brushBtn.addEventListener('click', () => {
     isDrawingMode = !isDrawingMode;
     
     if (isDrawingMode) {
-        isErasingMode = false;
-        isTextMode = false;
-        isCircleMode = false;
-        isRectMode = false;
-        isTriangleMode = false;
-        isImageMode = false;
+        erasingMode = false;
+        textMode = false;
+        circleMode = false;
+        rectMode = false;
+        triangleMode = false;
+        isImgMode = false;
         ctx.globalCompositeOperation = 'source-over';
     }
     
@@ -130,15 +150,15 @@ brushBtn.addEventListener('click', () => {
 });
 
 eraserBtn.addEventListener('click', () => {
-    isErasingMode = !isErasingMode;
+    erasingMode = !erasingMode;
     
-    if (isErasingMode) {
+    if (erasingMode) {
         isDrawingMode = false;
-        isTextMode = false;
-        isCircleMode = false;
-        isRectMode = false;
-        isTriangleMode = false;
-        isImageMode = false;
+        textMode = false;
+        circleMode = false;
+        rectMode = false;
+        triangleMode = false;
+        isImgMode = false;
         ctx.globalCompositeOperation = 'destination-out';
     }
     
@@ -147,15 +167,15 @@ eraserBtn.addEventListener('click', () => {
 
 // Shape button event handlers
 circleBtn.addEventListener('click', () => {
-    isCircleMode = !isCircleMode;
+    circleMode = !circleMode;
     
-    if (isCircleMode) {
+    if (circleMode) {
         isDrawingMode = false;
-        isErasingMode = false;
-        isTextMode = false;
-        isRectMode = false;
-        isTriangleMode = false;
-        isImageMode = false;
+        erasingMode = false;
+        textMode = false;
+        rectMode = false;
+        triangleMode = false;
+        isImgMode = false;
         ctx.globalCompositeOperation = 'source-over';
     }
     
@@ -163,15 +183,15 @@ circleBtn.addEventListener('click', () => {
 });
 
 rectBtn.addEventListener('click', () => {
-    isRectMode = !isRectMode;
+    rectMode = !rectMode;
     
-    if (isRectMode) {
+    if (rectMode) {
         isDrawingMode = false;
-        isErasingMode = false;
-        isTextMode = false;
-        isCircleMode = false;
-        isTriangleMode = false;
-        isImageMode = false;
+        erasingMode = false;
+        textMode = false;
+        circleMode = false;
+        triangleMode = false;
+        isImgMode = false;
         ctx.globalCompositeOperation = 'source-over';
     }
     
@@ -179,15 +199,15 @@ rectBtn.addEventListener('click', () => {
 });
 
 triangleBtn.addEventListener('click', () => {
-    isTriangleMode = !isTriangleMode;
+    triangleMode = !triangleMode;
     
-    if (isTriangleMode) {
+    if (triangleMode) {
         isDrawingMode = false;
-        isErasingMode = false;
-        isTextMode = false;
-        isCircleMode = false;
-        isRectMode = false;
-        isImageMode = false;
+        erasingMode = false;
+        textMode = false;
+        circleMode = false;
+        rectMode = false;
+        isImgMode = false;
         ctx.globalCompositeOperation = 'source-over';
     }
     
@@ -196,15 +216,15 @@ triangleBtn.addEventListener('click', () => {
 
 // text operations
 textBtn.addEventListener('click', () => {
-    isTextMode = !isTextMode;
+    textMode = !textMode;
     
-    if (isTextMode) {
+    if (textMode) {
         isDrawingMode = false;
-        isErasingMode = false;
-        isCircleMode = false;
-        isRectMode = false;
-        isTriangleMode = false;
-        isImageMode = false;
+        erasingMode = false;
+        circleMode = false;
+        rectMode = false;
+        triangleMode = false;
+        isImgMode = false;
         ctx.globalCompositeOperation = 'source-over';
     } else {
         textInputActive = false;
@@ -213,18 +233,16 @@ textBtn.addEventListener('click', () => {
     updateButtonStates();
 });
 
-document.getElementById('fontFamily').addEventListener('change', (e) => {
-    fontFamily = e.target.value;
+document.getElementById('fontType').addEventListener('change', (e) => {
+    fontType = e.target.value;
 });
 
 document.getElementById('fontSize').addEventListener('change', (e) => {
     fontSize = parseInt(e.target.value);
 });
 
-// Replace the current canvas text click event handler with this improved version
-
 canvas.addEventListener('click', (e) => {
-    if (!isTextMode) return;
+    if (!textMode) return;
     
     // If there's already an active text input, remove it first
     if (textInputActive) {
@@ -236,45 +254,50 @@ canvas.addEventListener('click', (e) => {
     }
     
     const pos = getMousePos(canvas, e);
-    textPositionX = pos.x;
-    textPositionY = pos.y;
+    textPosX = pos.x;
+    textPosY = pos.y;
     
     // make a new text
     textInputActive = true;
-    const canvasRect = canvas.getBoundingClientRect();
-    const inputElement = document.createElement('input');
-    inputElement.type = 'text';
-    inputElement.id = 'canvasTextInput';
-    inputElement.style.position = 'absolute';
-    inputElement.style.left = (canvasRect.left + pos.x) + 'px';
-    inputElement.style.top = (canvasRect.top + pos.y - 15) + 'px'; 
-    inputElement.style.fontFamily = fontFamily;
-    inputElement.style.fontSize = fontSize + 'px';
-    inputElement.style.color = color;
-    inputElement.style.background = 'transparent';
-    inputElement.style.border = '1px dotted #999';
-    inputElement.style.outline = 'none';
-    inputElement.style.minWidth = '100px';
-    inputElement.style.zIndex = 1000;
-    document.body.appendChild(inputElement);
-    inputElement.focus();
+    const textInput = makeText(textPosX, textPosY);
+    document.body.appendChild(textInput);
+    textInput.focus();
     
     const enterHandler = function(e) {
         if (e.key === 'Enter') {
-            confirmText(inputElement);
+            confirmText(textInput);
         }
     };
-    inputElement.addEventListener('keydown', enterHandler);
-    inputElement.enterHandler = enterHandler;
+    textInput.addEventListener('keydown', enterHandler);
+    textInput.enterHandler = enterHandler;
 });
+
+function makeText(posX, posY){
+    const canvasRect = canvas.getBoundingClientRect();
+    let text = document.createElement('input');
+    text.type = 'text';
+    text.id = 'canvasTextInput';
+    text.style.fontType = fontType;
+    text.style.fontSize = fontSize + 'px';
+    text.style.position = 'absolute';
+    text.style.left = (canvasRect.left + posX) + 'px';
+    text.style.top = (canvasRect.top + posY - 15) + 'px'; 
+    text.style.color = color;
+    text.style.background = 'transparent';
+    text.style.border = '1px dotted #999';
+    text.style.outline = 'none';
+    text.style.minWidth = '100px';
+    text.style.zIndex = 1000;
+    return text;
+}
 
 function confirmText(inputElement) {
     const text = inputElement.value;
-    if (text && textPositionX !== null && textPositionY !== null) {
-        ctx.font = `${fontSize}px ${fontFamily}`;
+    if (text && textPosX !== null && textPosY !== null) {
+        ctx.font = `${fontSize}px ${fontType}`;
         ctx.fillStyle = color;
         ctx.textBaseline = 'middle';
-        ctx.fillText(text, textPositionX, textPositionY);
+        ctx.fillText(text, textPosX, textPosY);
     }
     
     // Clean
@@ -284,39 +307,34 @@ function confirmText(inputElement) {
     if (document.body.contains(inputElement)) {
         document.body.removeChild(inputElement);
     }
-    
-    // close text input
     textInputActive = false;
 }
 
-// Modify the image tool button handler
+
+// image upload
 imageBtn.addEventListener('click', () => {
-    // If already in image mode, toggle it off
-    if (isImageMode) {
-        isImageMode = false;
-        currentImage = null;
+    if (isImgMode) {
+        isImgMode = false;
+        curImg = null;
         updateButtonStates();
         return;
     }
     
-    // Otherwise, enter image mode and directly open file picker
-    isImageMode = true;
+    isImgMode = true;
     isDrawingMode = false;
-    isErasingMode = false;
-    isTextMode = false;
-    isCircleMode = false;
-    isRectMode = false;
-    isTriangleMode = false;
+    erasingMode = false;
+    textMode = false;
+    circleMode = false;
+    rectMode = false;
+    triangleMode = false;
     ctx.globalCompositeOperation = 'source-over';
     
-    // Open file dialog immediately
-    imageUpload.click();
+    imgUpload.click();
     
     updateButtonStates();
 });
 
-// Keep the file input change handler the same
-imageUpload.addEventListener('change', (e) => {
+imgUpload.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (file && file.type.match('image.*')) {
         loadImage(file);
@@ -331,11 +349,11 @@ function loadImage(file) {
         const img = new Image();
         
         img.onload = function() {
-            currentImage = img;
-            // Scale very large images down to fit
-            const maxDimension = Math.max(img.width, img.height);
-            if (maxDimension > canvas.width / 2) {
-                const scale = (canvas.width / 2) / maxDimension;
+            curImg = img;
+            // let it fit 
+            const maxDim = Math.max(img.width, img.height);
+            if (maxDim > canvas.width / 2) {
+                const scale = (canvas.width / 2) / maxDim;
                 img.width *= scale;
                 img.height *= scale;
             }
@@ -352,50 +370,46 @@ function loadImage(file) {
 // do clear
 document.getElementById('clearBtn').addEventListener('click', () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
+    tmpCtx.clearRect(0, 0, tmpCanvas.width, tmpCanvas.height);
     
     // reset
     isDrawingMode = false;
-    isErasingMode = false;
-    isTextMode = false;
+    erasingMode = false;
+    textMode = false;
     isDrawing = false;
-    isCircleMode = false;
-    isRectMode = false;
-    isTriangleMode = false;
+    circleMode = false;
+    rectMode = false;
+    triangleMode = false;
     isShapeDrawing = false;
-    isImageMode = false;
-    currentImage = null;
-    isImagePlacing = false;
+    isImgMode = false;
+    curImg = null;
+    placingImg = false;
     
     updateButtonStates();
 });
 
 // Shape drawing
 canvas.addEventListener('mousedown', (e) => {
-    if (isDrawingMode || isErasingMode) {
+    const pos = getMousePos(canvas, e);
+    if (isDrawingMode || erasingMode) {
         isDrawing = true;
-        const pos = getMousePos(canvas, e);
         lastX = pos.x;
         lastY = pos.y;
-    } else if (isCircleMode || isRectMode || isTriangleMode) {
+    } else if (circleMode || rectMode || triangleMode) {
         isShapeDrawing = true;
-        const pos = getMousePos(canvas, e);
         startX = pos.x;
         startY = pos.y;
-        tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
-        tempCtx.drawImage(canvas, 0, 0);
-    } else if (isImageMode && currentImage) {
-        isImagePlacing = true;
-        const pos = getMousePos(canvas, e);
-        imagePositionX = pos.x - (currentImage.width / 2);
-        imagePositionY = pos.y - (currentImage.height / 2);
+        tmpCtx.clearRect(0, 0, tmpCanvas.width, tmpCanvas.height);
+        tmpCtx.drawImage(canvas, 0, 0);
+    } else if (isImgMode && curImg) {
+        placingImg = true;
+        imgPosX = pos.x - (curImg.width / 2);
+        imgPosY = pos.y - (curImg.height / 2);
         
-        // Save the current canvas state
-        tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
-        tempCtx.drawImage(canvas, 0, 0);
+        tmpCtx.clearRect(0, 0, tmpCanvas.width, tmpCanvas.height);
+        tmpCtx.drawImage(canvas, 0, 0);
         
-        // Draw the image at the initial position
-        ctx.drawImage(currentImage, imagePositionX, imagePositionY, currentImage.width, currentImage.height);
+        ctx.drawImage(curImg, imgPosX, imgPosY, curImg.width, curImg.height);
         return;
     }
 });
@@ -407,28 +421,26 @@ canvas.addEventListener('mouseup', (e) => {
         isShapeDrawing = false;
     }
     
-    // Add this block to exit image mode after placing an image
-    if (isImagePlacing && currentImage) {
-        // After placing the image, exit image mode
-        isImageMode = false;
-        currentImage = null;
-        updateButtonStates(); // Update UI to reflect this change
+    if (placingImg && curImg) {
+        isImgMode = false;
+        curImg = null;
+        updateButtonStates();
         showMessage('Image placed successfully', 'success');
     }
     
     isDrawing = false;
-    isImagePlacing = false;
+    placingImg = false;
 });
 
 canvas.addEventListener('mouseleave', () => {
     isDrawing = false;
     isShapeDrawing = false;
-    isImagePlacing = false;
+    placingImg = false;
 });
 
 canvas.addEventListener('mousemove', (e) => {
+    const pos = getMousePos(canvas, e);
     if (isDrawing) {
-        const pos = getMousePos(canvas, e);
         ctx.lineWidth = brushSize;
         ctx.lineCap = 'round';
         ctx.strokeStyle = color;
@@ -441,20 +453,16 @@ canvas.addEventListener('mousemove', (e) => {
         lastX = pos.x;
         lastY = pos.y;
     } else if (isShapeDrawing) {
-        const pos = getMousePos(canvas, e);
-        
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(tempCanvas, 0, 0);
-        
+        ctx.drawImage(tmpCanvas, 0, 0);
         previewShape(startX, startY, pos.x, pos.y);
-    } else if (isImagePlacing && currentImage) {
-        const pos = getMousePos(canvas, e);
-        imagePositionX = pos.x - (currentImage.width / 2);
-        imagePositionY = pos.y - (currentImage.height / 2);
+    } else if (placingImg && curImg) {
+        imgPosX = pos.x - (curImg.width / 2);
+        imgPosY = pos.y - (curImg.height / 2);
         
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(tempCanvas, 0, 0);
-        ctx.drawImage(currentImage, imagePositionX, imagePositionY, currentImage.width, currentImage.height);
+        ctx.drawImage(tmpCanvas, 0, 0);
+        ctx.drawImage(curImg, imgPosX, imgPosY, curImg.width, curImg.height);
     }
 });
 
@@ -463,18 +471,18 @@ function previewShape(x1, y1, x2, y2) {
     ctx.strokeStyle = color;
     ctx.fillStyle = color;
     
-    if (isCircleMode) {
+    if (circleMode) {
         const radius = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
         ctx.beginPath();
         ctx.arc(x1, y1, radius, 0, Math.PI * 2);
         ctx.stroke();
-    } else if (isRectMode) {
+    } else if (rectMode) {
         const width = x2 - x1;
         const height = y2 - y1;
         ctx.beginPath();
         ctx.rect(x1, y1, width, height);
         ctx.stroke();
-    } else if (isTriangleMode) {
+    } else if (triangleMode) {
         ctx.beginPath();
         ctx.moveTo(x1, y1);
         ctx.lineTo(x2, y2);
@@ -489,18 +497,18 @@ function drawShape(x1, y1, x2, y2) {
     ctx.strokeStyle = color;
     ctx.fillStyle = color;
     
-    if (isCircleMode) {
+    if (circleMode) {
         const radius = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
         ctx.beginPath();
         ctx.arc(x1, y1, radius, 0, Math.PI * 2);
         ctx.stroke();
-    } else if (isRectMode) {
+    } else if (rectMode) {
         const width = x2 - x1;
         const height = y2 - y1;
         ctx.beginPath();
         ctx.rect(x1, y1, width, height);
         ctx.stroke();
-    } else if (isTriangleMode) {
+    } else if (triangleMode) {
         ctx.beginPath();
         ctx.moveTo(x1, y1);
         ctx.lineTo(x2, y2);
@@ -514,13 +522,10 @@ document.getElementById('downloadBtn').addEventListener('click', downloadCanvas)
 
 async function downloadCanvas() {
     try {
-        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        const imgD = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
         
-        // Get timestamp for filename suggestion
-        const timestamp = new Date().toISOString().slice(0,19).replace(/[-:T]/g, '');
-        const suggestedName = `web-canvas-${timestamp}.png`;
+        const suggestedName = `web-canvas.png`;
         
-        // Try to use the File System Access API (Chrome, Edge)
         if ('showSaveFilePicker' in window) {
             try {
                 const fileHandle = await window.showSaveFilePicker({
@@ -532,27 +537,27 @@ async function downloadCanvas() {
                 });
                 
                 const writable = await fileHandle.createWritable();
-                await writable.write(blob);
+                await writable.write(imgD);
                 await writable.close();
                 
                 showMessage('Image saved successfully!', 'success');
                 return;
             } catch (err) {
                 if (err.name !== 'AbortError') {
-                    console.error('File System Access API error:', err);
+                    console.error('File System API error:', err);
                 }
             }
         }
         
         if (window.navigator && window.navigator.msSaveBlob) {
-            window.navigator.msSaveBlob(blob, suggestedName);
+            window.navigator.msSaveBlob(imgD, suggestedName);
             showMessage('Image downloaded!', 'success');
             return;
         }
         
         const link = document.createElement('a');
         link.download = suggestedName;
-        link.href = URL.createObjectURL(blob);
+        link.href = URL.createObjectURL(imgD);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -565,21 +570,18 @@ async function downloadCanvas() {
     }
 }
 
-// Optional: Add a simple notification system
 function showMessage(message, type = 'info') {
     const msgDiv = document.createElement('div');
     msgDiv.className = `alert alert-${type} message-notification`;
     msgDiv.textContent = message;
     document.body.appendChild(msgDiv);
     
-    // Auto-dismiss after 3 seconds
     setTimeout(() => {
         msgDiv.style.opacity = '0';
         setTimeout(() => document.body.removeChild(msgDiv), 500);
     }, 3000);
 }
 
-// Add at the end of your script or in document ready
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize tooltips
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="cut"]'));

@@ -23,7 +23,7 @@ body {
     justify-content: center;
     width: 90%;
     max-width: 1200px;
-    position: relative; /* This helps with absolute positioning */
+    position: relative;
 }
 
 canvas {
@@ -31,10 +31,9 @@ canvas {
     background-color: white;
     flex-grow: 1;
     max-width: 100%;
-    position: relative; /* Important for input positioning */
+    position: relative;
 }
 
-/* New container to hold both toolbars */
 .toolbar-container {
     display: flex;
     flex-direction: column;
@@ -44,7 +43,6 @@ canvas {
     width: 120px;
 }
 
-/* Update toolbar class */
 .toolbar {
     display: flex;
     flex-direction: column;
@@ -53,7 +51,6 @@ canvas {
     width: 100%;
 }
 
-/* New shapes container */
 .shapes-container {
     width: 100%;
     border-top: 1px solid #ccc;
@@ -106,26 +103,10 @@ button i.bi {
     background: rgba(255, 255, 255, 0.7);
 }
 
-/* Update button group styling */
-.btn-group {
-    display: flex;
-    width: 100%;
-    justify-content: center;
-}
-
-.btn-group .btn {
-    flex: 1;
-    padding: 5px;
-    font-size: 12px;
-    min-width: 0;
-}
-
 .btn-outline-dark.active {
     background-color: #343a40;
     color: white;
 }
-
-/* Add this to your existing CSS */
 
 #colorSelector {
     margin: 10px 0;
@@ -133,7 +114,6 @@ button i.bi {
 }
 
 
-/* Notification messages */
 .message-notification {
     position: fixed;
     bottom: 20px;
@@ -145,7 +125,6 @@ button i.bi {
     transition: opacity 0.5s ease;
 }
 
-/* Add to your existing CSS */
 #imageControls {
     border: 1px solid #ddd;
     padding: 10px;
@@ -167,13 +146,24 @@ button i.bi {
     box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
 }
 
-/* Improve shape buttons */
+.btn-group {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+}
+
+.btn-group .btn {
+    flex: 1;
+    padding: 5px;
+    font-size: 12px;
+    min-width: 0;
+}
+
 .btn-group .shape-btn {
     padding: 5px 8px;
     text-align: center;
 }
 
-/* Hide text on larger screens */
 @media (min-width: 769px) {
     .btn-group .shape-btn .btn-text {
         display: none;
@@ -189,7 +179,6 @@ button i.bi {
     }
 }
 
-/* Show text on mobile */
 @media (max-width: 768px) {
     .btn-group .shape-btn {
         display: flex;
@@ -198,12 +187,10 @@ button i.bi {
     }
 }
 
-/* Improve tooltip appearance */
 .tooltip {
     font-size: 0.8rem;
 }
 
-/* Mobile responsiveness updates */
 @media (max-width: 768px) {
     .container {
         flex-direction: column;
