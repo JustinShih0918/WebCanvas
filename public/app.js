@@ -9,7 +9,7 @@ let curHistoryIdx = -1;
 const MAX_HISTORY = 50;
 
 // mode variables
-let isDrawingMode = false;
+let drawingMode = false;
 let erasingMode = false;
 let textMode = false;
 let circleMode = false;
@@ -74,7 +74,6 @@ document.getElementById('colorBtn').addEventListener('click', () => {
     const btnRect = document.getElementById('colorBtn').getBoundingClientRect();
     const windowWid = window.innerWidth;
     let leftPos = 0;
-    console.log(windowWid);
     if(windowWid > 768) leftPos = btnRect.left - 400;
     else if(windowWid <= 768 && windowWid > 450) leftPos = btnRect.left;
     else leftPos = 0;
@@ -114,14 +113,10 @@ function getContrastColor(hexColor) {
 
 // save history
 function saveHistory(){
-    if(curHistoryIdx < history.length - 1){
-        history = history.slice(0, curHistoryIdx + 1);
-    }
 
     const curMove = canvas.toDataURL();
     history.push(curMove);
-    curHistoryIdx = history.length - 1;
-    console.log(curHistoryIdx);
+    curHistoryIdx++;
 
     if(history.length > MAX_HISTORY){
         history.shift();
@@ -132,11 +127,12 @@ function saveHistory(){
 
 function updateUndoRedoBtn() {
     undoBtn.disabled = (curHistoryIdx <= 0);
-    redoBtn.disabled = (curHistoryIdx >= history.length - 1);
+    redoBtn.disabled = (curHistoryIdx > history.length - 1);
 }
 
 function doRestore(move) {
     const img = new Image();
+    ctx.globalCompositeOperation = 'source-over';
     img.onload = function(){
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0);
@@ -145,7 +141,7 @@ function doRestore(move) {
 }
 
 undoBtn.addEventListener('click', () => {
-    if(curHistoryIdx > 0){
+    if(curHistoryIdx >= 0){
         curHistoryIdx--;
         doRestore(history[curHistoryIdx]);
         updateUndoRedoBtn();
@@ -181,7 +177,7 @@ function updateButtonStates() {
     
     // Update cursor based on mode
     switch (true) {
-        case isDrawingMode:
+        case drawingMode:
             canvas.style.cursor = 'url("media/brush-icon.png") 0 0, crosshair';
             break;
         case erasingMode:
@@ -211,7 +207,7 @@ function updateButtonStates() {
 }
 
 function toggleButtons(){
-    brushBtn.classList.toggle('active', isDrawingMode);
+    brushBtn.classList.toggle('active', drawingMode);
     eraserBtn.classList.toggle('active', erasingMode);
     textBtn.classList.toggle('active', textMode);
     circleBtn.classList.toggle('active', circleMode);
@@ -222,26 +218,31 @@ function toggleButtons(){
 
 document.getElementById('brushSize').addEventListener('change', (e) => brushSize = e.target.value);
 brushBtn.addEventListener('click', () => {
-    isDrawingMode = !isDrawingMode;
-    
-    if (isDrawingMode) {
-        erasingMode = false;
-        textMode = false;
-        circleMode = false;
-        rectMode = false;
-        triangleMode = false;
-        isImgMode = false;
-        ctx.globalCompositeOperation = 'source-over';
+    // If already in drawing mode, just toggle off
+    if (drawingMode) {
+        drawingMode = false;
+        updateButtonStates();
+        return;
     }
+
+    drawingMode = true;
+    erasingMode = false;
+    textMode = false;
+    circleMode = false;
+    rectMode = false;
+    triangleMode = false;
+    isImgMode = false;
+    ctx.globalCompositeOperation = 'source-over';
     
     updateButtonStates();
 });
 
 eraserBtn.addEventListener('click', () => {
+    // if(!erasingMode) saveHistory();
     erasingMode = !erasingMode;
     
     if (erasingMode) {
-        isDrawingMode = false;
+        drawingMode = false;
         textMode = false;
         circleMode = false;
         rectMode = false;
@@ -258,7 +259,7 @@ circleBtn.addEventListener('click', () => {
     circleMode = !circleMode;
     
     if (circleMode) {
-        isDrawingMode = false;
+        drawingMode = false;
         erasingMode = false;
         textMode = false;
         rectMode = false;
@@ -274,7 +275,7 @@ rectBtn.addEventListener('click', () => {
     rectMode = !rectMode;
     
     if (rectMode) {
-        isDrawingMode = false;
+        drawingMode = false;
         erasingMode = false;
         textMode = false;
         circleMode = false;
@@ -290,7 +291,7 @@ triangleBtn.addEventListener('click', () => {
     triangleMode = !triangleMode;
     
     if (triangleMode) {
-        isDrawingMode = false;
+        drawingMode = false;
         erasingMode = false;
         textMode = false;
         circleMode = false;
@@ -307,7 +308,7 @@ textBtn.addEventListener('click', () => {
     textMode = !textMode;
     
     if (textMode) {
-        isDrawingMode = false;
+        drawingMode = false;
         erasingMode = false;
         circleMode = false;
         rectMode = false;
@@ -410,7 +411,7 @@ imageBtn.addEventListener('click', () => {
     }
     
     isImgMode = true;
-    isDrawingMode = false;
+    drawingMode = false;
     erasingMode = false;
     textMode = false;
     circleMode = false;
@@ -462,7 +463,7 @@ document.getElementById('clearBtn').addEventListener('click', () => {
     tmpCtx.clearRect(0, 0, tmpCanvas.width, tmpCanvas.height);
     
     // reset
-    isDrawingMode = false;
+    drawingMode = false;
     erasingMode = false;
     textMode = false;
     isDrawing = false;
@@ -484,7 +485,7 @@ document.getElementById('clearBtn').addEventListener('click', () => {
 // Shape drawing
 canvas.addEventListener('mousedown', (e) => {
     const pos = getMousePos(canvas, e);
-    if (isDrawingMode || erasingMode) {
+    if (drawingMode || erasingMode) {
         isDrawing = true;
         lastX = pos.x;
         lastY = pos.y;
